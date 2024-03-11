@@ -1,5 +1,6 @@
 <?php include('config.php'); ?>
 <?php include('includes/public/head_section.php'); ?>
+<?php include('includes/public/registration_login.php'); ?>
 <title>MyWebSite | Home </title>
 
 </head>
