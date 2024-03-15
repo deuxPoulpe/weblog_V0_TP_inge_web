@@ -1,3 +1,5 @@
+<?php isAdmin()?>
+
 <!DOCTYPE html>
 <html>
 <head>

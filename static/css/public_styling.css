@@ -246,7 +246,7 @@ form input:focus {
 	color: #A6A6A6;
 	font-style: italic;
 }
-.content .post .post_info span.read_more {
+.content .post .post_info span .read_more {
 	position: absolute;
 	right: 5px; bottom: 5px;
 }

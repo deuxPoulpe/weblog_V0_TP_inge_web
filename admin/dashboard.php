@@ -1,6 +1,7 @@
 <?php include('../config.php'); ?>
 <?php include(ROOT_PATH . '/includes/admin_functions.php'); ?>
 <?php include(ROOT_PATH . '/includes/admin/head_section.php'); ?>
+
 <title>Admin | Dashboard</title>
 </head>
 
@@ -22,11 +23,29 @@
 		<h1>Welcome</h1>
 		<div class="stats">
 			<a href="users.php" class="first">
-				<span>43</span> <br>
+				<span> 
+				<?php 
+				global $conn; 
+				$sql = "SELECT count(*) as tot FROM users";
+				$result = mysqli_query($conn, $sql);
+				$data = mysqli_fetch_assoc($result);
+				echo $data['tot']; 
+				?> 
+				</span> 
+				<br>
 				<span>Newly registered users</span>
 			</a>
 			<a href="posts.php">
-				<span>43</span> <br>
+				<span>
+					<?php 
+				global $conn; 
+				$sql = "SELECT count(*) as tot FROM posts";
+				$result = mysqli_query($conn, $sql);
+				$data = mysqli_fetch_assoc($result);
+				echo $data['tot']; 
+				?> 
+				</span>
+				 <br>
 				<span>Published posts</span>
 			</a>
 			<a>
