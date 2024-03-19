@@ -43,7 +43,7 @@ $admins = getAdminUsers(); // by admin roles i mean (Admin or Author), table use
 					<option value="" selected disabled>Assign role</option>
 					<?php foreach ($roles as $role) : ?>
 						<option value="<?php echo $role['id']; ?>">
-							<?php echo $role['role']; ?>
+							<?php echo $role['name']; ?>
 						</option>
 					<?php endforeach ?>
 				</select>

@@ -14,7 +14,7 @@
 
 		<!-- Middle form - to create and edit  -->
 		<div class="action">
-			<h1 class="page-title">Manage Post</h1>
+			<h1 class="page-title">Manage Posts</h1>
 
 			
 		</div>
