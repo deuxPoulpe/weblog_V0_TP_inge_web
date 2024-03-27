@@ -59,7 +59,7 @@ $posts = getAllPosts(); // by admin roles i mean (Admin or Author), table users
 								<?php endif ?></td>
 								</td>
 								<td>
-									<a class="fa fa-pencil btn edit" href="posts.php?edit-post=<?php echo $post['id'] ?>">
+									<a class="fa fa-pencil btn edit" href="create_post.php?edit-post=<?php echo $post['id'] ?>">
 									</a>
 								</td>
 								<td>
