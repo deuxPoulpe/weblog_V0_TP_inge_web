@@ -99,3 +99,11 @@ function printPost($post){
     echo "<hr>";
     echo "</div>";
 }
+
+function format_image_name($name){
+    $name = strtolower($name);
+    $name = str_replace(' ', '-', $name);
+    // replace special characters including quotes, slashes, etc.
+    $name = preg_replace('/[^A-Za-z0-9\-]/', '', $name);
+    return $name;
+}

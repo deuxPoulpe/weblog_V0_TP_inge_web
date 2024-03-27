@@ -82,6 +82,11 @@ th {
 .header .logo h1 {
 	color: white;
 }
+.header .home-btn h1{
+	color: white;
+	text-decoration: none;
+	float: right;
+}
 .header .user-info {
 	width: 10%;
 	margin-top: 10px;

@@ -5,6 +5,10 @@
 		</a>
 	</div>
 
+	<div class="home-btn">
+		<a href="<?php echo BASE_URL . 'index.php' ?>"><h1>Home</h1></a>
+	</div>
+
 	<?php if (isset($_SESSION['user'])) : ?>
 		<div class="user-info">
 			<span><?php echo $_SESSION['user']['username'] ?></span> &nbsp; &nbsp;

@@ -1,5 +1,16 @@
 <?php
 
+$isEditingPost = false;
+$title = "";
+$body = "";
+$errors = array();
+
+
+
+if (isset($_GET['edit-post'])) {
+    $post_id = $_GET['edit-post'];
+    edit_post($post_id);
+}
 
 if (isset($_GET['delete-post'])) {
     $post_id = $_GET['delete-post'];
@@ -16,7 +27,7 @@ if (isset($_GET['publish'])) {
     publishPost($post_id);
 }
 
-if (isset($_POST['create_post'])) {
+if (isset($_POST['create-post'])) {
     create_post($_POST);
 }
 
@@ -30,24 +41,25 @@ function create_post($request_values) {
         $image_tmp = $_FILES['featured_image']['tmp_name'];
         if (is_dir($image_path)) {
             if (move_uploaded_file($image_tmp, $image_path . $image_name)) {
-                echo "L'image a été téléchargée avec succès.";
+                $_SESSION['message'] = "Image téléchargée avec succès";
             } 
+            
             else {
-                echo "Not uploaded because of error #".$_FILES["file"]["error"];
-            }
-        } else {
-            echo 'Upload directory is not writable, or does not exist.';
-        }
+                $_SESSION['message'] = "Aucune image téléchargée";
+            }   
     } 
     else {
-        echo "Aucune image téléchargée.";
+        array_push($errors, "error when trying to load image");
+    }
     }
     
     // Get values from form
-    $username = mysqli_real_escape_string($conn, $_SESSION['user']['username']);
+    $user_id = mysqli_real_escape_string($conn, $_SESSION['user']['id']);
     $title = mysqli_real_escape_string($conn, $_POST["title"]);
-    $slug = mysqli_real_escape_string($conn, $_POST['slug']);
+    $slug = str_replace(' ', '_', $title);
+    $slug = strtolower($slug);
     $body = mysqli_real_escape_string($conn, $_POST['body']);
+    $topic_id = mysqli_real_escape_string($conn, $_POST['topic_id']);
 
     // Ensure that the form is correctly filled
     if (empty($title)) {
@@ -57,39 +69,48 @@ function create_post($request_values) {
         array_push($errors, "Slug is required");
     }
 
-    // Fetch the user id
-    $sql_userid = "SELECT id FROM users WHERE username = '$username'";
-    $result = mysqli_query($conn, $sql_userid);
+    // Insert the post into the database
+    $sql = "INSERT INTO posts (user_id, title, slug, views, image, body, published, created_at, updated_at) VALUES ('$user_id', '$title', '$slug', 0, '$image_name', '$body', 1, '" . date("Y/m/d") . "', '" . date("Y/m/d") . "')";
+    $result = mysqli_query($conn, $sql);
 
+    if (!$result) {
+        array_push($errors, "Error when adding post");
+    }
+
+    // Get the last inserted post id
+    $post_id = mysqli_insert_id($conn);
+
+    // Link the post to the topic
+    $sql_post_topic = "INSERT INTO post_topic (post_id, topic_id) VALUES ('$post_id', '$topic_id')";
+    $result = mysqli_query($conn, $sql_post_topic);
     
-    if ($result && mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $userid = $row['id'];
-
-        // Insert the post into the database
-        $sql = "INSERT INTO posts (user_id, title, slug, views, image, body, published, created_at, updated_at) VALUES ('$userid', '$title', '$slug', 0, '$image_name', '$body', 1, '" . date("Y/m/d") . "', '" . date("Y/m/d") . "')";
-        $result = mysqli_query($conn, $sql);
-        if (!$result) {
-            array_push($errors, "Error when adding post");
-        }
-        else {
-            $_SESSION['message'] = "Post created";
-            header("location: create_post.php");                         
-        }
+    if (!$result) {
+        array_push($errors, "Error when linking post to topic");
     }
-    else {
-        array_push($errors, "Error: User not found");
-    }
+    
+    if (count($errors) == 0) {
+        $_SESSION['message'] = "Post created successfully";
+        header('location: create_post.php');
+        exit(0);
+    }                
 }
 
-function edit_post($post_id, $title, $content, $category, $published) {
-    global $conn;
-    $query = "UPDATE posts SET title = '$title', content = '$content', category = '$category', published = '$published' WHERE post_id = '$post_id'";
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['message'] = "Post successfully updated";
-        header("Location: posts.php");
+function edit_post($post_id) {
+    global $conn, $title, $body, $isEditingPost, $post_id;
+    
+    $sql = "SELECT * FROM posts WHERE id=$post_id LIMIT 1";
+    $result = mysqli_query($conn, $sql);
+    $post = mysqli_fetch_assoc($result);
+    if (empty($post)) {
+        array_push($errors, "No post found");
+        header("location: posts.php");
         exit(0);
+    } else {
+        $title = $post['title'];
+        $body = $post['body'];
+        $isEditingPost = true;
     }
+    
 }
 
 function delete_post($post_id) {

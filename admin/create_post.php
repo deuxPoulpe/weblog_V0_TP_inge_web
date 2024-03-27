@@ -7,7 +7,8 @@
 
 <?php 
 	// Get all topics
-	$topics = getAllTopicsList();	
+	$topics = getAllTopicsList();
+    global $errors;
 
 ?>
 
@@ -64,7 +65,7 @@
 				<?php if ($isEditingPost === true): ?> 
 					<button type="submit" class="btn" name="update_post">UPDATE</button>
 				<?php else: ?>
-					<button type="submit" class="btn" name="create_post">Save Post</button>
+					<button type="submit" class="btn" name="create-post">Save Post</button>
 				<?php endif ?>
 
 			</form>

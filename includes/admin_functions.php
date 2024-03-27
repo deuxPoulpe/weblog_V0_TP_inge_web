@@ -138,7 +138,7 @@ function editAdmin($adminUser_id){
     $admin = mysqli_fetch_assoc($result);
     // set form values ($username and $email) on the form to be updated
     $admin_id = (int)$admin['id'];
-        $username = $admin['username'];
+    $username = $admin['username'];
     $email = $admin['email'];
     $isEditingUser = true;
 }
