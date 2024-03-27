@@ -122,3 +122,11 @@ function esc(string $value)
     return $val;
 }
 
+function getAllTopics()
+{
+    global $conn;
+    $sql = "SELECT * FROM topics";
+    $result = mysqli_query($conn, $sql);
+    $topics = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return $topics;
+}

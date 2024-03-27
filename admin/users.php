@@ -66,11 +66,11 @@ $admins = getAdminUsers(); // by admin roles i mean (Admin or Author), table use
 			<?php include(ROOT_PATH . '/includes/public/messages.php') ?>
 
 			<?php if (empty($admins)) : ?>
-				<h1>No admins in the database.</h1>
+				<h1>No admins/users in the database.</h1>
 			<?php else : ?>
 				<table class="table">
 					<thead>
-						<th>N</th>
+						<th>ID</th>
 						<th>Admin</th>
 						<th>Role</th>
 						<th colspan="2">Action</th>
@@ -78,7 +78,7 @@ $admins = getAdminUsers(); // by admin roles i mean (Admin or Author), table use
 					<tbody>
 						<?php foreach ($admins as $key => $admin) : ?>
 							<tr>
-								<td><?php echo $key + 1; ?></td>
+								<td><?php echo $admin["id"]; ?></td>
 								<td>
 									<?php echo $admin['username']; ?>, &nbsp;
 									<?php echo $admin['email']; ?>

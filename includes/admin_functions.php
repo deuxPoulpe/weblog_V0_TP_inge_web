@@ -26,9 +26,24 @@ if (isset($_POST['create_admin'])) {
     createAdmin($_POST);
 }
 
+// if user clicks the delete admin button
+if (isset($_GET['delete-admin'])) {
+    $admin_id = $_GET['delete-admin'];
+    delUsers($admin_id);
+}
+
+if (isset($_GET['edit-admin'])) {
+    $admin_id = $_GET['edit-admin'];
+    editAdmin($admin_id);
+}
+
+if (isset($_POST['update_admin'])) {
+    updateAdmin($_POST);
+}
+
 function getAdminUsers() {
     global $conn;
-    $sql = "SELECT * FROM users WHERE role = 'Admin'"; // query that retrieves all admin users
+    $sql = "SELECT * FROM users"; // query that retrieves all admin users
     $result = mysqli_query($conn, $sql);
 
     $users = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -109,5 +124,95 @@ function getRoles() {
     $roles = mysqli_fetch_all($result, MYSQLI_ASSOC);
     // return the array of users
     return $roles;
+}
+
+/* * * * * * * * * * * * * * * * * * * * *
+* - Takes admin id as parameter
+* - Fetches the admin from database
+* - sets admin fields on form for editing
+* * * * * * * * * * * * * * * * * * * * * */
+function editAdmin($adminUser_id){
+    global $conn, $username, $isEditingUser, $admin_id, $email;
+    $sql = "SELECT * FROM users WHERE id=$adminUser_id LIMIT 1";
+    $result = mysqli_query($conn, $sql);
+    $admin = mysqli_fetch_assoc($result);
+    // set form values ($username and $email) on the form to be updated
+    $admin_id = (int)$admin['id'];
+        $username = $admin['username'];
+    $email = $admin['email'];
+    $isEditingUser = true;
+}
+
+    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+    * - Receives admin request from form and updates in database
+    * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+    
+function updateAdmin($request_values){
+    global $conn, $errors, $username, $isEditingUser, $admin_id, $email;
+
+    // Solve the role of the user
+    $role_id = $request_values['role_id'];
+    if (empty($role_id)) {
+        array_push($errors, "Role is required");
+    }
+    else {
+        $sql = "SELECT name FROM roles WHERE id=$role_id";
+        $result = mysqli_query($conn, $sql);
+        $role = mysqli_fetch_assoc($result)['name'];
+    }
+
+    // Get values from form
+    $username = $request_values['username'];
+    $email = $request_values['email'];
+    $password = md5($request_values['password']);
+    $passwordConfirmation = md5($request_values['passwordConfirmation']);
+
+    $sql = "SELECT * FROM users WHERE email='$request_values[email]' AND id != $request_values[admin_id]";
+    $result = mysqli_query($conn, $sql);
+    $users_with_same_email = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    // if email is already in use
+    if (count($users_with_same_email) > 0) {
+        array_push($errors, "Email already in use");
+    }
+
+    // Ensure that the form is correctly filled
+    if (empty($username)) {
+        array_push($errors, "Username is required");
+    }
+    if (empty($email)) {
+        array_push($errors, "Email is required");
+    }
+    if (empty($password)) {
+        array_push($errors, "Password is required");
+    }
+    if (empty($passwordConfirmation)) {
+        array_push($errors, "Password confirmation is required");
+    }
+    if ($password != $passwordConfirmation) {
+        array_push($errors, "The two passwords do not match");
+    }
+
+    // Modify the admin in the database
+    if (count($errors) == 0) {
+        $sql = "UPDATE users SET username='$request_values[username]', email='$request_values[email]', role='$role', password='$password' WHERE id=$request_values[admin_id]";
+        if (mysqli_query($conn, $sql)) {
+            $_SESSION['message'] = "Admin user updated successfully";
+            header('location: users.php');
+            exit(0);
+        }
+    }
+    $errors[] = "Failed to update admin user";
+    return $errors;
+}
+
+function delUsers($user_id) {
+    global $conn;
+    $sql = "DELETE FROM users WHERE id=$user_id";
+    if (mysqli_query($conn, $sql)) {
+        $_SESSION['message'] = "User deleted successfully";
+        header("location: users.php");
+        exit(0);
+    }
 }
 
